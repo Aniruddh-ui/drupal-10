@@ -1,0 +1,10 @@
+# Ignore AI & Project Management files
+guide.md
+phases.md
+*.pdf
+.agent/
+
+# Standard Drupal ignores (if not already there)
+/vendor/
+/web/sites/*/settings.php
+/web/sites/*/files/

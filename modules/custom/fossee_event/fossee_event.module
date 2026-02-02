@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Primary module file for the FOSSEE Event Registration module.
+ *
+ * Contains procedural hook implementations only.
+ * Business logic is delegated to services (EventService, RegistrationService).
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_mail().
+ *
+ * Defines email templates for user confirmation and admin notification.
+ * Email content is built here; sending logic is in RegistrationService.
+ */
+function fossee_event_mail(string $key, array &$message, array $params): void {
+  $registration = $params['registration'] ?? [];
+
+  switch ($key) {
+    case 'user_confirmation':
+      $message['subject'] = t('Registration Confirmed - FOSSEE Event');
+      $message['body'][] = t('Dear @name,', ['@name' => $registration['name'] ?? 'Participant']);
+      $message['body'][] = '';
+      $message['body'][] = t('Your registration has been successfully submitted.');
+      $message['body'][] = '';
+      $message['body'][] = t('Registration Details:');
+      $message['body'][] = t('- Email: @email', ['@email' => $registration['email'] ?? '']);
+      $message['body'][] = t('- Department: @dept', ['@dept' => $registration['department'] ?? '']);
+      $message['body'][] = '';
+      $message['body'][] = t('Thank you for registering.');
+      $message['body'][] = t('FOSSEE Team');
+      break;
+
+    case 'admin_notification':
+      $message['subject'] = t('New Event Registration - FOSSEE');
+      $message['body'][] = t('A new registration has been submitted.');
+      $message['body'][] = '';
+      $message['body'][] = t('Participant Details:');
+      $message['body'][] = t('- Name: @name', ['@name' => $registration['name'] ?? '']);
+      $message['body'][] = t('- Email: @email', ['@email' => $registration['email'] ?? '']);
+      $message['body'][] = t('- Department: @dept', ['@dept' => $registration['department'] ?? '']);
+      $message['body'][] = '';
+      $message['body'][] = t('Please review from the admin dashboard.');
+      break;
+  }
+}

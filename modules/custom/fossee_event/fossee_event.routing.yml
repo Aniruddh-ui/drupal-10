@@ -1,0 +1,46 @@
+# FOSSEE Event Module Routes
+# Defines all URL paths for the module.
+
+# Admin: Global module settings (Config API).
+fossee_event.admin_settings:
+  path: '/admin/config/fossee/settings'
+  defaults:
+    _form: '\Drupal\fossee_event\Form\SettingsForm'
+    _title: 'FOSSEE Event Settings'
+  requirements:
+    _permission: 'administer fossee events'
+
+# Admin: Create new event (Custom DB).
+fossee_event.event_add:
+  path: '/admin/fossee/event/add'
+  defaults:
+    _form: '\Drupal\fossee_event\Form\EventForm'
+    _title: 'Add Event'
+  requirements:
+    _permission: 'administer fossee events'
+
+# Admin: View all registrations.
+fossee_event.registration_list:
+  path: '/admin/fossee/registrations'
+  defaults:
+    _controller: '\Drupal\fossee_event\Controller\RegistrationListController::listRegistrations'
+    _title: 'Event Registrations'
+  requirements:
+    _permission: 'view fossee registrations'
+
+# Admin: Export registrations to CSV.
+fossee_event.export_csv:
+  path: '/admin/fossee/export'
+  defaults:
+    _controller: '\Drupal\fossee_event\Controller\RegistrationListController::exportCsv'
+  requirements:
+    _permission: 'view fossee registrations'
+
+# Public: Registration form.
+fossee_event.register:
+  path: '/fossee/register'
+  defaults:
+    _form: '\Drupal\fossee_event\Form\RegistrationForm'
+    _title: 'Event Registration'
+  requirements:
+    _permission: 'register for fossee events'

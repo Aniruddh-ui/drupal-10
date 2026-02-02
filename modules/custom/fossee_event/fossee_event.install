@@ -1,0 +1,165 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the FOSSEE Event module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ *
+ * Defines two custom database tables:
+ * - fossee_event_config: Stores event definitions (NOT Config API).
+ * - fossee_event_registration: Stores user registration submissions.
+ *
+ * Architectural Decision: Using custom tables instead of Config API because
+ * events are dynamic content created/deleted by admins, not module configuration.
+ */
+function fossee_event_schema(): array {
+  $schema = [];
+
+  // Table 1: Events storage.
+  // Stores event definitions created by administrators.
+  $schema['fossee_event_config'] = [
+    'description' => 'Stores event definitions for the FOSSEE Event module.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary key: Unique event identifier.',
+      ],
+      'event_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The display name of the event.',
+      ],
+      'category' => [
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Event category for AJAX filtering.',
+      ],
+      'start_date' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: Registration window opens.',
+      ],
+      'end_date' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: Registration window closes.',
+      ],
+      'event_date' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: The actual event date.',
+      ],
+      'created' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: Record creation time.',
+      ],
+      'changed' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: Record last modification time.',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      // Index on category for fast AJAX lookups.
+      'category' => ['category'],
+      // Index on start_date for registration window queries.
+      'start_date' => ['start_date'],
+      // Index on end_date for registration window queries.
+      'end_date' => ['end_date'],
+      // Index on event_date for AJAX cascade (Category -> Date -> Event).
+      'event_date' => ['event_date'],
+    ],
+  ];
+
+  // Table 2: User registrations storage.
+  // Stores registration submissions from public users.
+  $schema['fossee_event_registration'] = [
+    'description' => 'Stores user registration submissions for events.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary key: Unique registration identifier.',
+      ],
+      'event_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Foreign key: References fossee_event_config.id.',
+      ],
+      'name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Participant full name.',
+      ],
+      'email' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Participant email address.',
+      ],
+      'department' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Participant department or organization.',
+      ],
+      'event_date' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: The selected event date.',
+      ],
+      'created' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Unix timestamp: Registration submission time.',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      // Foreign key index for joining with events table.
+      'event_id' => ['event_id'],
+    ],
+    'unique keys' => [
+      // Composite unique constraint: Prevents duplicate registrations.
+      // A user (email) can only register once per event date.
+      // This enforces the duplicate check at the database level (defense in depth).
+      'email_event_date' => ['email', 'event_date'],
+    ],
+  ];
+
+  return $schema;
+}

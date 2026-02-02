@@ -1,0 +1,20 @@
+# FOSSEE Event Module Services
+# All services use constructor injection - NO \Drupal:: static calls.
+
+services:
+  # Event Service: CRUD operations for the events table.
+  fossee_event.event_service:
+    class: Drupal\fossee_event\Service\EventService
+    arguments:
+      - '@database'
+      - '@datetime.time'
+
+  # Registration Service: Handles submissions, validation, and email triggers.
+  fossee_event.registration_service:
+    class: Drupal\fossee_event\Service\RegistrationService
+    arguments:
+      - '@database'
+      - '@plugin.manager.mail'
+      - '@config.factory'
+      - '@datetime.time'
+

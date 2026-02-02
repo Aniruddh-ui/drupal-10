@@ -1,0 +1,15 @@
+# FOSSEE Event Module Permissions
+# These permissions control access to event administration and registration.
+
+administer fossee events:
+  title: 'Administer FOSSEE Events'
+  description: 'Create, edit, and delete events. Access module configuration settings.'
+  restrict access: true
+
+view fossee registrations:
+  title: 'View FOSSEE Registrations'
+  description: 'View the list of event registrations and export data to CSV.'
+
+register for fossee events:
+  title: 'Register for FOSSEE Events'
+  description: 'Access the public registration form to register for events.'

@@ -1,0 +1,5 @@
+name: 'FOSSEE Event Registration'
+type: module
+description: 'Custom module for managing event registrations with AJAX-driven forms, email notifications, and CSV export capabilities.'
+package: 'FOSSEE'
+core_version_requirement: ^10

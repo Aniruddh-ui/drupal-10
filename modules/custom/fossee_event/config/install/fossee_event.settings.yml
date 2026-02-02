@@ -1,0 +1,11 @@
+# Default configuration values for the FOSSEE Event module.
+# These are installed when the module is enabled.
+
+# Email address for admin notifications (empty by default - must be configured).
+admin_notification_email: ''
+
+# Whether admin notification emails are enabled.
+admin_notification_enabled: true
+
+# Whether user confirmation emails are enabled.
+user_confirmation_enabled: true
